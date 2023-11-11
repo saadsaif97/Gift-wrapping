@@ -3,6 +3,7 @@ import {
   reactExtension,
   Checkbox,
   useCartLineTarget,
+  useApplyCartLinesChange,
 } from "@shopify/ui-extensions-react/checkout";
 import { useEffect, useState } from "react";
 
@@ -14,16 +15,17 @@ export default reactExtension(
 function Extension() {
   const { query } = useApi();
   const target = useCartLineTarget();
+  const changeLineItems = useApplyCartLinesChange()
   const productId = target?.merchandise?.product.id;
 
-  const [giftProduct, setGiftProduct] = useState(null);
+  const [giftWrapProduct, setGiftWrapProduct] = useState(null);
 
   useEffect(() => {
     (async () => {
       const giftWrap = await getGiftWrap(productId);
       console.log({ productId, giftWrap });
       if (giftWrap) {
-        setGiftProduct(giftWrap);
+        setGiftWrapProduct(giftWrap);
       }
     })();
   }, []);
@@ -47,9 +49,14 @@ function Extension() {
 
   function addGiftWrap() {
     console.log("Add gift wrap");
+    changeLineItems({
+      type: "addCartLine",
+      quantity: target.quantity,
+      merchandiseId: giftWrapProduct
+    })
   }
 
-  if (giftProduct) {
+  if (giftWrapProduct) {
     return <Checkbox onChange={() => addGiftWrap()}>Add gift wrap</Checkbox>;
   }
 

@@ -19465,6 +19465,12 @@ ${errorInfo.componentStack}`);
       this.name = "CheckoutUIExtensionError";
     }
   };
+  var ExtensionHasNoMethodError = class extends Error {
+    constructor(method, target) {
+      super(`Cannot call '${method}()' on target '${target}'. The corresponding property was not found on the API.`);
+      this.name = "ExtensionHasNoMethodError";
+    }
+  };
   var ExtensionHasNoTargetError = class extends Error {
     constructor(method, target) {
       super(`Cannot call '${method}()' on target '${target}'. Property 'target' is not found on api.`);
@@ -19503,6 +19509,15 @@ ${errorInfo.componentStack}`);
     return subscription.current;
   }
 
+  // node_modules/.pnpm/@shopify+ui-extensions-react@2023.10.0_@shopify+ui-extensions@2023.10.0_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/cart-lines.mjs
+  function useApplyCartLinesChange() {
+    const api = useApi();
+    if ("applyCartLinesChange" in api) {
+      return api.applyCartLinesChange;
+    }
+    throw new ExtensionHasNoMethodError("applyCartLinesChange", api.extension.target);
+  }
+
   // node_modules/.pnpm/@shopify+ui-extensions-react@2023.10.0_@shopify+ui-extensions@2023.10.0_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/cart-line-target.mjs
   function useCartLineTarget() {
     const api = useApi();
@@ -19523,14 +19538,15 @@ ${errorInfo.componentStack}`);
     var _a;
     const { query } = useApi();
     const target = useCartLineTarget();
+    const changeLineItems = useApplyCartLinesChange();
     const productId = (_a = target == null ? void 0 : target.merchandise) == null ? void 0 : _a.product.id;
-    const [giftProduct, setGiftProduct] = (0, import_react11.useState)(null);
+    const [giftWrapProduct, setGiftWrapProduct] = (0, import_react11.useState)(null);
     (0, import_react11.useEffect)(() => {
       (() => __async(this, null, function* () {
         const giftWrap = yield getGiftWrap(productId);
         console.log({ productId, giftWrap });
         if (giftWrap) {
-          setGiftProduct(giftWrap);
+          setGiftWrapProduct(giftWrap);
         }
       }))();
     }, []);
@@ -19554,8 +19570,13 @@ ${errorInfo.componentStack}`);
     }
     function addGiftWrap() {
       console.log("Add gift wrap");
+      changeLineItems({
+        type: "addCartLine",
+        quantity: target.quantity,
+        merchandiseId: giftWrapProduct
+      });
     }
-    if (giftProduct) {
+    if (giftWrapProduct) {
       return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Checkbox2, { onChange: () => addGiftWrap(), children: "Add gift wrap" });
     }
     return null;
