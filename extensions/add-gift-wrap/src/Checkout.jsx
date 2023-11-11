@@ -22,6 +22,8 @@ function Extension() {
   const variantId = target.merchandise.id;
   const [giftWrapProduct, setGiftWrapProduct] = useState(null);
 
+  console.log({target})
+  
   useEffect(() => {
     (async () => {
       const giftWrap = await getGiftWrap(productId);
@@ -77,7 +79,7 @@ function Extension() {
       return item.attributes.some((attr) => {
         return attr.key === "_wrap_for" && attr.value === variantId;
       });
-    });
+    }) || target.lineComponents.length;
   }
 
   function getLineItemIdByVariantId(variantId) {
@@ -90,7 +92,7 @@ function Extension() {
         checked={productIsWrappedAlready()}
         onChange={() => addGiftWrap()}
       >
-        Add gift wrap
+        Gift wrapping
       </Checkbox>
     );
   }

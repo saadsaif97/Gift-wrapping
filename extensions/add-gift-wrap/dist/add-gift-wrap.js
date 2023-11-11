@@ -19549,6 +19549,7 @@ ${errorInfo.componentStack}`);
     const productId = (_a = target == null ? void 0 : target.merchandise) == null ? void 0 : _a.product.id;
     const variantId = target.merchandise.id;
     const [giftWrapProduct, setGiftWrapProduct] = (0, import_react11.useState)(null);
+    console.log({ target });
     (0, import_react11.useEffect)(() => {
       (() => __async(this, null, function* () {
         const giftWrap = yield getGiftWrap(productId);
@@ -19603,7 +19604,7 @@ ${errorInfo.componentStack}`);
         return item.attributes.some((attr) => {
           return attr.key === "_wrap_for" && attr.value === variantId;
         });
-      });
+      }) || target.lineComponents.length;
     }
     function getLineItemIdByVariantId(variantId2) {
       return cartLines.find((item) => item.merchandise.id == variantId2).id;
@@ -19614,7 +19615,7 @@ ${errorInfo.componentStack}`);
         {
           checked: productIsWrappedAlready(),
           onChange: () => addGiftWrap(),
-          children: "Add gift wrap"
+          children: "Gift wrapping"
         }
       );
     }
