@@ -19529,7 +19529,7 @@ ${errorInfo.componentStack}`);
       (() => __async(this, null, function* () {
         const giftWrap = yield getGiftWrap(productId);
         console.log({ productId, giftWrap });
-        if (giftProduct) {
+        if (giftWrap) {
           setGiftProduct(giftWrap);
         }
       }))();
@@ -19558,6 +19558,6 @@ ${errorInfo.componentStack}`);
     if (giftProduct) {
       return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Checkbox2, { onChange: () => addGiftWrap(), children: "Add gift wrap" });
     }
+    return null;
   }
 })();
-//# sourceMappingURL=add-gift-wrap.js.map

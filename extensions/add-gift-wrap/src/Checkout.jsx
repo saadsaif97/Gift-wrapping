@@ -22,7 +22,7 @@ function Extension() {
     (async () => {
       const giftWrap = await getGiftWrap(productId);
       console.log({ productId, giftWrap });
-      if (giftProduct) {
+      if (giftWrap) {
         setGiftProduct(giftWrap);
       }
     })();
@@ -50,6 +50,8 @@ function Extension() {
   }
 
   if (giftProduct) {
-    return <Checkbox onChange={() => addGiftWrap()}>Add gift wrap</Checkbox>; 
+    return <Checkbox onChange={() => addGiftWrap()}>Add gift wrap</Checkbox>;
   }
+
+  return null;
 }
