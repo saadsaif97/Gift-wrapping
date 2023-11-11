@@ -1,0 +1,11 @@
+query RunInput {
+  cart {
+    lines {
+      id
+      quantity
+      wrap_for: attribute(key: "_wrap_for") {
+        value
+      }
+    }
+  }
+}
