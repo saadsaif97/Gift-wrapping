@@ -17,3 +17,6 @@ api_version = "2023-10"
 
 [pos]
 embedded = false
+
+[build]
+dev_store_url = "checkoutninja.myshopify.com"
