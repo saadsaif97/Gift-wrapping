@@ -42,6 +42,7 @@ export function run(input) {
             quantity: giftWrap.quantity,
           },
         ],
+        title: `${variantTitle} + Gift Wrapping`
       },
     };
 
@@ -60,5 +61,5 @@ function getLineIDFromVariantId(variantId, lineItems) {
 }
 
 function getTitleFromVariantId(variantId, lineItems) {
-  return lineItems.find(item => item.merchandise.id == variantId).merchandise.title;
+  return lineItems.find(item => item.merchandise.id == variantId).merchandise.product.title;
 }

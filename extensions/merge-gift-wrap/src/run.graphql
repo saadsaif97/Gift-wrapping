@@ -5,7 +5,9 @@ query RunInput {
       merchandise {
         ... on ProductVariant {
           id
-          title
+          product {
+            title
+          }
         }
       }
       quantity
