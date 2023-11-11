@@ -19510,6 +19510,12 @@ ${errorInfo.componentStack}`);
   }
 
   // node_modules/.pnpm/@shopify+ui-extensions-react@2023.10.0_@shopify+ui-extensions@2023.10.0_react-reconciler@0.29.0_react@18.2.0/node_modules/@shopify/ui-extensions-react/build/esm/surfaces/checkout/hooks/cart-lines.mjs
+  function useCartLines() {
+    const {
+      lines
+    } = useApi();
+    return useSubscription(lines);
+  }
   function useApplyCartLinesChange() {
     const api = useApi();
     if ("applyCartLinesChange" in api) {
@@ -19538,13 +19544,14 @@ ${errorInfo.componentStack}`);
     var _a;
     const { query } = useApi();
     const target = useCartLineTarget();
+    const cartLines = useCartLines();
     const changeLineItems = useApplyCartLinesChange();
     const productId = (_a = target == null ? void 0 : target.merchandise) == null ? void 0 : _a.product.id;
+    const variantId = target.merchandise.id;
     const [giftWrapProduct, setGiftWrapProduct] = (0, import_react11.useState)(null);
     (0, import_react11.useEffect)(() => {
       (() => __async(this, null, function* () {
         const giftWrap = yield getGiftWrap(productId);
-        console.log({ productId, giftWrap });
         if (giftWrap) {
           setGiftWrapProduct(giftWrap);
         }
@@ -19569,16 +19576,49 @@ ${errorInfo.componentStack}`);
       });
     }
     function addGiftWrap() {
-      console.log("Add gift wrap");
-      changeLineItems({
-        type: "addCartLine",
-        quantity: target.quantity,
-        merchandiseId: giftWrapProduct
+      if (productIsWrappedAlready()) {
+        console.log("remove gift wrap");
+        changeLineItems({
+          type: "removeCartLine",
+          id: getLineItemIdByVariantId(giftWrapProduct),
+          quantity: target.quantity
+        });
+      } else {
+        console.log("add gift wrap");
+        changeLineItems({
+          type: "addCartLine",
+          quantity: target.quantity,
+          merchandiseId: giftWrapProduct,
+          attributes: [
+            {
+              key: "_wrap_for",
+              value: variantId
+            }
+          ]
+        });
+      }
+    }
+    function productIsWrappedAlready() {
+      return cartLines.some((item) => {
+        return item.attributes.some((attr) => {
+          return attr.key === "_wrap_for" && attr.value === variantId;
+        });
       });
     }
+    function getLineItemIdByVariantId(variantId2) {
+      return cartLines.find((item) => item.merchandise.id == variantId2).id;
+    }
     if (giftWrapProduct) {
-      return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(Checkbox2, { onChange: () => addGiftWrap(), children: "Add gift wrap" });
+      return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
+        Checkbox2,
+        {
+          checked: productIsWrappedAlready(),
+          onChange: () => addGiftWrap(),
+          children: "Add gift wrap"
+        }
+      );
     }
     return null;
   }
 })();
+//# sourceMappingURL=add-gift-wrap.js.map

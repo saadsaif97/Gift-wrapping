@@ -4,6 +4,7 @@ import {
   Checkbox,
   useCartLineTarget,
   useApplyCartLinesChange,
+  useCartLines,
 } from "@shopify/ui-extensions-react/checkout";
 import { useEffect, useState } from "react";
 
@@ -15,15 +16,15 @@ export default reactExtension(
 function Extension() {
   const { query } = useApi();
   const target = useCartLineTarget();
-  const changeLineItems = useApplyCartLinesChange()
+  const cartLines = useCartLines();
+  const changeLineItems = useApplyCartLinesChange();
   const productId = target?.merchandise?.product.id;
-
+  const variantId = target.merchandise.id;
   const [giftWrapProduct, setGiftWrapProduct] = useState(null);
 
   useEffect(() => {
     (async () => {
       const giftWrap = await getGiftWrap(productId);
-      console.log({ productId, giftWrap });
       if (giftWrap) {
         setGiftWrapProduct(giftWrap);
       }
@@ -48,16 +49,50 @@ function Extension() {
   }
 
   function addGiftWrap() {
-    console.log("Add gift wrap");
-    changeLineItems({
-      type: "addCartLine",
-      quantity: target.quantity,
-      merchandiseId: giftWrapProduct
-    })
+    if (productIsWrappedAlready()) {
+      console.log("remove gift wrap");
+      changeLineItems({
+        type: "removeCartLine",
+        id: getLineItemIdByVariantId(giftWrapProduct),
+        quantity: target.quantity,
+      });
+    } else {
+      console.log("add gift wrap");
+      changeLineItems({
+        type: "addCartLine",
+        quantity: target.quantity,
+        merchandiseId: giftWrapProduct,
+        attributes: [
+          {
+            key: "_wrap_for",
+            value: variantId,
+          },
+        ],
+      });
+    }
+  }
+
+  function productIsWrappedAlready() {
+    return cartLines.some((item) => {
+      return item.attributes.some((attr) => {
+        return attr.key === "_wrap_for" && attr.value === variantId;
+      });
+    });
+  }
+
+  function getLineItemIdByVariantId(variantId) {
+    return cartLines.find((item) => item.merchandise.id == variantId).id;
   }
 
   if (giftWrapProduct) {
-    return <Checkbox onChange={() => addGiftWrap()}>Add gift wrap</Checkbox>;
+    return (
+      <Checkbox
+        checked={productIsWrappedAlready()}
+        onChange={() => addGiftWrap()}
+      >
+        Add gift wrap
+      </Checkbox>
+    );
   }
 
   return null;
