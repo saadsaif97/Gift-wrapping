@@ -19573,15 +19573,35 @@ ${errorInfo.componentStack}`);
     const [wrappingId, setWrappingId] = (0, import_react11.useState)(null);
     const [merge] = useAttributeValues(["_merge"]);
     const attributeChange = useApplyAttributeChange();
-    console.log({ target, merge });
+    console.log({ merge });
     (0, import_react11.useEffect)(() => {
       (() => __async(this, null, function* () {
         const giftWrap = yield getGiftWrap(productId);
         if (giftWrap) {
           setWrappingId(giftWrap);
+          console.log({ giftWrap });
+          removeUnmergedGiftWrap(giftWrap);
         }
       }))();
     }, []);
+    function removeUnmergedGiftWrap(giftWrap) {
+      if (!merge) {
+        removeGiftWrap(giftWrap);
+      } else {
+        const mergedVariants = merge == null ? void 0 : merge.split(",");
+        if (!mergedVariants.includes(target.merchandise.id)) {
+          removeGiftWrap(giftWrap);
+        }
+      }
+    }
+    function removeGiftWrap(giftWrap) {
+      changeLineItems({
+        type: "removeCartLine",
+        quantity: target.quantity,
+        id: getLineItemIdByVariantId(giftWrap)
+      });
+      console.log({ giftWrap, lineId: getLineItemIdByVariantId(giftWrap) });
+    }
     function getGiftWrap(productId2) {
       return __async(this, null, function* () {
         var _a2, _b;
@@ -19609,11 +19629,6 @@ ${errorInfo.componentStack}`);
               key: "_merge",
               value: removeMerge(variantId),
               type: "updateAttribute"
-            });
-            yield changeLineItems({
-              type: "removeCartLine",
-              quantity: target.quantity,
-              id: getLineItemIdByVariantId(wrappingId)
             });
           } else {
             console.log("add gift wrap");
@@ -19664,7 +19679,9 @@ ${errorInfo.componentStack}`);
       }) || target.lineComponents.length;
     }
     function getLineItemIdByVariantId(variantId2) {
-      return cartLines.find((item) => item.merchandise.id == variantId2).id;
+      var _a2;
+      console.log({ variantId: variantId2 });
+      return (_a2 = cartLines.find((item) => item.merchandise.id == variantId2)) == null ? void 0 : _a2.id;
     }
     if (wrappingId) {
       return /* @__PURE__ */ (0, import_jsx_runtime4.jsx)(
