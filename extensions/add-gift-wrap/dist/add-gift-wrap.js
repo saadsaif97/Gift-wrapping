@@ -19578,20 +19578,21 @@ ${errorInfo.componentStack}`);
         const giftWrap = yield getGiftWrap(productId);
         if (giftWrap) {
           setWrappingId(giftWrap);
-          removeUnmergedGiftWrap(giftWrap);
         }
       }))();
     }, []);
     (0, import_react11.useEffect)(() => {
-      console.log({ merge, wrappingId });
-    }, [merge]);
-    function removeUnmergedGiftWrap(giftWrap) {
+      if (wrappingId) {
+        removeUnmergedGiftWrap();
+      }
+    }, [merge, wrappingId]);
+    function removeUnmergedGiftWrap() {
       if (!merge) {
-        removeGiftWrap(giftWrap);
+        removeGiftWrap(wrappingId);
       } else {
         const mergedVariants = merge == null ? void 0 : merge.split(",");
-        if (!mergedVariants.includes(target.merchandise.id)) {
-          removeGiftWrap(giftWrap);
+        if (!(mergedVariants == null ? void 0 : mergedVariants.includes(target.merchandise.id))) {
+          removeGiftWrap(wrappingId);
         }
       }
     }
@@ -19601,7 +19602,6 @@ ${errorInfo.componentStack}`);
         quantity: target.quantity,
         id: getLineItemIdByVariantId(giftWrap)
       });
-      console.log({ giftWrap, lineId: getLineItemIdByVariantId(giftWrap) });
     }
     function getGiftWrap(productId2) {
       return __async(this, null, function* () {
@@ -19625,14 +19625,12 @@ ${errorInfo.componentStack}`);
       return __async(this, null, function* () {
         try {
           if (productIsWrappedAlready()) {
-            console.log("remove gift wrap", { variantId });
             yield attributeChange({
               key: "_merge",
               value: removeMerge(variantId),
               type: "updateAttribute"
             });
           } else {
-            console.log("add gift wrap");
             yield attributeChange({
               key: "_merge",
               value: addMerge(variantId),
@@ -19681,7 +19679,6 @@ ${errorInfo.componentStack}`);
     }
     function getLineItemIdByVariantId(variantId2) {
       var _a2;
-      console.log({ variantId: variantId2 });
       return (_a2 = cartLines.find((item) => item.merchandise.id == variantId2)) == null ? void 0 : _a2.id;
     }
     if (wrappingId) {

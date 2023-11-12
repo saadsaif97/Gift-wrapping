@@ -31,22 +31,23 @@ function Extension() {
       const giftWrap = await getGiftWrap(productId);
       if (giftWrap) {
         setWrappingId(giftWrap);
-        removeUnmergedGiftWrap(giftWrap);
       }
     })();
   }, []);
 
   useEffect(() => {
-    console.log({ merge, wrappingId });
-  }, [merge]);
+    if (wrappingId) {
+      removeUnmergedGiftWrap();
+    }
+  }, [merge, wrappingId]);
 
-  function removeUnmergedGiftWrap(giftWrap) {
+  function removeUnmergedGiftWrap() {
     if (!merge) {
-      removeGiftWrap(giftWrap);
+      removeGiftWrap(wrappingId);
     } else {
       const mergedVariants = merge?.split(",");
-      if (!mergedVariants.includes(target.merchandise.id)) {
-        removeGiftWrap(giftWrap);
+      if (!mergedVariants?.includes(target.merchandise.id)) {
+        removeGiftWrap(wrappingId);
       }
     }
   }
@@ -57,7 +58,6 @@ function Extension() {
       quantity: target.quantity,
       id: getLineItemIdByVariantId(giftWrap),
     });
-    console.log({ giftWrap, lineId: getLineItemIdByVariantId(giftWrap) });
   }
 
   async function getGiftWrap(productId) {
@@ -80,15 +80,12 @@ function Extension() {
   async function addGiftWrap() {
     try {
       if (productIsWrappedAlready()) {
-        console.log("remove gift wrap", { variantId });
-
         await attributeChange({
           key: "_merge",
           value: removeMerge(variantId),
           type: "updateAttribute",
         });
       } else {
-        console.log("add gift wrap");
         await attributeChange({
           key: "_merge",
           value: addMerge(variantId),
@@ -141,7 +138,6 @@ function Extension() {
   }
 
   function getLineItemIdByVariantId(variantId) {
-    console.log({ variantId });
     return cartLines.find((item) => item.merchandise.id == variantId)?.id;
   }
 
