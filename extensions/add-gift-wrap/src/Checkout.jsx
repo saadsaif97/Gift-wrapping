@@ -5,6 +5,8 @@ import {
   useCartLineTarget,
   useApplyCartLinesChange,
   useCartLines,
+  useApplyAttributeChange,
+  useAttributeValues,
 } from "@shopify/ui-extensions-react/checkout";
 import { useEffect, useState } from "react";
 
@@ -21,9 +23,11 @@ function Extension() {
   const productId = target?.merchandise?.product.id;
   const variantId = target.merchandise.id;
   const [giftWrapProduct, setGiftWrapProduct] = useState(null);
+  const [merge] = useAttributeValues(["_merge"]);
+  const attributeChange = useApplyAttributeChange();
 
-  console.log({target})
-  
+  console.log({ target, merge });
+
   useEffect(() => {
     (async () => {
       const giftWrap = await getGiftWrap(productId);
@@ -50,17 +54,23 @@ function Extension() {
     }
   }
 
-  function addGiftWrap() {
+  async function addGiftWrap() {
     if (productIsWrappedAlready()) {
-      console.log("remove gift wrap");
-      changeLineItems({
-        type: "removeCartLine",
-        id: getLineItemIdByVariantId(giftWrapProduct),
-        quantity: target.quantity,
+      console.log("remove gift wrap", { variantId });
+      
+      await attributeChange({
+        key: "_merge",
+        value: removeMerge(variantId),
+        type: "updateAttribute",
       });
     } else {
       console.log("add gift wrap");
-      changeLineItems({
+      await attributeChange({
+        key: "_merge",
+        value: addMerge(variantId),
+        type: "updateAttribute",
+      });
+      await changeLineItems({
         type: "addCartLine",
         quantity: target.quantity,
         merchandiseId: giftWrapProduct,
@@ -74,12 +84,29 @@ function Extension() {
     }
   }
 
+  function addMerge(variantId) {
+    if (!merge) {
+      return `${variantId}`;
+    } else {
+      const mergedVariants = merge.split(",");
+      mergedVariants.push(`${variantId}`);
+      return mergedVariants.join(",");
+    }
+  }
+
+  function removeMerge(variantId) {
+    const mergedVariants = merge.split(",");
+    return mergedVariants.filter((id) => id != `${variantId}`).join(",");
+  }
+
   function productIsWrappedAlready() {
-    return cartLines.some((item) => {
-      return item.attributes.some((attr) => {
-        return attr.key === "_wrap_for" && attr.value === variantId;
-      });
-    }) || target.lineComponents.length;
+    return (
+      cartLines.some((item) => {
+        return item.attributes.some((attr) => {
+          return attr.key === "_wrap_for" && attr.value === variantId;
+        });
+      }) || target.lineComponents.length
+    );
   }
 
   function getLineItemIdByVariantId(variantId) {
