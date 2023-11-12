@@ -19573,17 +19573,18 @@ ${errorInfo.componentStack}`);
     const [wrappingId, setWrappingId] = (0, import_react11.useState)(null);
     const [merge] = useAttributeValues(["_merge"]);
     const attributeChange = useApplyAttributeChange();
-    console.log({ merge });
     (0, import_react11.useEffect)(() => {
       (() => __async(this, null, function* () {
         const giftWrap = yield getGiftWrap(productId);
         if (giftWrap) {
           setWrappingId(giftWrap);
-          console.log({ giftWrap });
           removeUnmergedGiftWrap(giftWrap);
         }
       }))();
     }, []);
+    (0, import_react11.useEffect)(() => {
+      console.log({ merge, wrappingId });
+    }, [merge]);
     function removeUnmergedGiftWrap(giftWrap) {
       if (!merge) {
         removeGiftWrap(giftWrap);
