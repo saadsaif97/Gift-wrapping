@@ -1,5 +1,8 @@
 query RunInput {
   cart {
+    merge: attribute(key: "_merge") {
+      value
+    }
     lines {
       id
       merchandise {

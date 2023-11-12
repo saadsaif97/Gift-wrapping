@@ -19,15 +19,19 @@ const NO_CHANGES = {
 export function run(input) {
   const operations = [];
 
-  const giftWraps = input.cart.lines.filter(line => line.wrap_for !== null);
+  const merge = input.cart.merge?.value
+  const variantsToMerge = merge?.split(',')
   
-  giftWraps.forEach((giftWrap) => {
+  const mergeWraps = input.cart.lines.filter(line => line.wrap_for !== null);
+  mergeWraps.forEach((giftWrap) => {
     
     const variantId = giftWrap.wrap_for?.value
     const variantLineId = getLineIDFromVariantId(variantId, input.cart.lines)
     const variantTitle = getTitleFromVariantId(variantId, input.cart.lines)
     
-    console.log(JSON.stringify(variantId, variantLineId, variantTitle))
+    if (variantId && !variantsToMerge?.includes(variantId)) {
+      return
+    }
     
     const mergeOperation = {
       merge: {
