@@ -25,6 +25,7 @@ function Extension() {
   const [wrappingId, setWrappingId] = useState(null);
   const [merge] = useAttributeValues(["_merge"]);
   const attributeChange = useApplyAttributeChange();
+  const [renderId, setRenderId] = useState(0);
 
   useEffect(() => {
     (async () => {
@@ -39,7 +40,7 @@ function Extension() {
     if (wrappingId) {
       removeUnmergedGiftWrap();
     }
-  }, [merge, wrappingId]);
+  }, [merge, wrappingId, renderId]);
 
   function removeUnmergedGiftWrap() {
     if (!merge) {
@@ -77,7 +78,7 @@ function Extension() {
     }
   }
 
-  async function addGiftWrap() {
+  async function handleGiftWrapping() {
     try {
       if (productIsWrappedAlready()) {
         await attributeChange({
@@ -85,6 +86,11 @@ function Extension() {
           value: removeMerge(variantId),
           type: "updateAttribute",
         });
+        
+        setTimeout(() => {
+          setRenderId(renderId+1)
+        }, 10);
+        
       } else {
         await attributeChange({
           key: "_merge",
@@ -145,7 +151,7 @@ function Extension() {
     return (
       <Checkbox
         checked={productIsWrappedAlready()}
-        onChange={() => addGiftWrap()}
+        onChange={() => handleGiftWrapping()}
       >
         Gift wrapping
       </Checkbox>

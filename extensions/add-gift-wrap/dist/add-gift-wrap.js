@@ -19573,6 +19573,7 @@ ${errorInfo.componentStack}`);
     const [wrappingId, setWrappingId] = (0, import_react11.useState)(null);
     const [merge] = useAttributeValues(["_merge"]);
     const attributeChange = useApplyAttributeChange();
+    const [renderId, setRenderId] = (0, import_react11.useState)(0);
     (0, import_react11.useEffect)(() => {
       (() => __async(this, null, function* () {
         const giftWrap = yield getGiftWrap(productId);
@@ -19585,7 +19586,7 @@ ${errorInfo.componentStack}`);
       if (wrappingId) {
         removeUnmergedGiftWrap();
       }
-    }, [merge, wrappingId]);
+    }, [merge, wrappingId, renderId]);
     function removeUnmergedGiftWrap() {
       if (!merge) {
         removeGiftWrap(wrappingId);
@@ -19621,7 +19622,7 @@ ${errorInfo.componentStack}`);
         }
       });
     }
-    function addGiftWrap() {
+    function handleGiftWrapping() {
       return __async(this, null, function* () {
         try {
           if (productIsWrappedAlready()) {
@@ -19630,6 +19631,9 @@ ${errorInfo.componentStack}`);
               value: removeMerge(variantId),
               type: "updateAttribute"
             });
+            setTimeout(() => {
+              setRenderId(renderId + 1);
+            }, 10);
           } else {
             yield attributeChange({
               key: "_merge",
@@ -19686,7 +19690,7 @@ ${errorInfo.componentStack}`);
         Checkbox2,
         {
           checked: productIsWrappedAlready(),
-          onChange: () => addGiftWrap(),
+          onChange: () => handleGiftWrapping(),
           children: "Gift wrapping"
         }
       );
